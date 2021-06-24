@@ -1,0 +1,8 @@
+# Ignore env vars file
+.env
+
+# Ignore PyCharm folder
+.idea
+
+# Ignore data dir
+data
