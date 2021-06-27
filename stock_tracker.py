@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 import pandas as pd
+from collections import namedtuple
 from dotenv import dotenv_values
 
 CONFIG = dotenv_values(".env")
@@ -43,12 +44,12 @@ class StockPrice:
         except Exception as err:
             print(f"Unexpected error opening data file is {repr(err)}")
             sys.exit(1)
-        finally:
-            with file:
-                file.write(all_stock_data)
+        # finally:
+        with file:
+            file.write(all_stock_data)
 
-            file.close()
-            self.get_stock_data()
+        file.close()
+        self.get_stock_data()
 
     def get_stock_data(self):
         try:
@@ -65,14 +66,31 @@ class StockPrice:
 
     def get_last_closing(self):
         yesterday_data = self.stock_data.iloc[0]
-        last_closing = yesterday_data.close
-        last_adjusted_closing = yesterday_data.adjusted_close
-        if last_closing != last_adjusted_closing:
+        yesterday_closing = yesterday_data.close
+        yesterday_adjusted_closing = yesterday_data.adjusted_close
+        if yesterday_closing != yesterday_adjusted_closing:
             print("They are not equal")
-            return last_adjusted_closing
+            return yesterday_adjusted_closing
         else:
             print("They are both equal")
-            return last_closing
+            return yesterday_closing
 
+    def compare_closing(self):
+        day_before_data = self.stock_data.iloc[1]
+        day_before_closing = day_before_data.close[1]
+        yesterday_closing = self.get_last_closing()
+        print(f"Day before price: {day_before_closing}\nYesterday price: {yesterday_closing}")
+        difference = (abs(yesterday_closing - day_before_closing)/yesterday_closing) * 100
+
+        if difference >= 0:
+            results = namedtuple("Compare Prices", ["difference", "up_or_down", "company_name"])
+            if yesterday_closing > day_before_closing:
+                direction_symbol = "🔺"
+            else:
+                direction_symbol = "🔻"
+
+            return results(difference, direction_symbol, self.company_name)
+        else:
+            return False
 
 # stock = StockPrice()
