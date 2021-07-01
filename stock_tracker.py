@@ -64,7 +64,7 @@ class StockPrice:
             print(self.stock_data.head())
             return self.stock_data
 
-    def get_last_closing(self):
+    def get_last_closing(self) -> float:
         yesterday_data = self.stock_data.iloc[0]
         yesterday_closing = yesterday_data.close
         yesterday_adjusted_closing = yesterday_data.adjusted_close
@@ -77,19 +77,20 @@ class StockPrice:
 
     def compare_closing(self):
         day_before_data = self.stock_data.iloc[1]
-        day_before_closing = day_before_data.close[1]
+        print(day_before_data)
+        day_before_closing = day_before_data.close
         yesterday_closing = self.get_last_closing()
         print(f"Day before price: {day_before_closing}\nYesterday price: {yesterday_closing}")
         difference = (abs(yesterday_closing - day_before_closing)/yesterday_closing) * 100
 
         if difference >= 0:
-            results = namedtuple("Compare Prices", ["difference", "up_or_down", "company_name"])
+            results = namedtuple("Compare_Prices", ["difference", "up_or_down", "company_name", "stock"])
             if yesterday_closing > day_before_closing:
                 direction_symbol = "🔺"
             else:
                 direction_symbol = "🔻"
 
-            return results(difference, direction_symbol, self.company_name)
+            return results(difference, direction_symbol, self.company_name, self.stock)
         else:
             return False
 
