@@ -8,14 +8,14 @@ CONFIG = dotenv_values(".env")
 
 class NewsContent:
     def __init__(self, *args, **kwargs):
-        self.difference = kwargs.get("price_difference")
-        self.direction_symbol = kwargs.get("up_or_down")
+        self.difference = kwargs.get("difference")
+        self.direction_symbol = kwargs.get("direction_symbol")
         self.company_name = kwargs.get("company_name")
         self.stock = kwargs.get("stock")
         # self.headlines = None
         # self.briefs = None
         self.news_url = "https://newsapi.org/v2/everything?"
-        self.news_params = {"apiKey": CONFIG.get("NEWS_API_KEY"), "qInTitle": self.company_name}
+        self.news_params = {"apiKey": CONFIG.get("NEWS_API_KEY"), "qInTitle": f"{self.company_name}"}
 
     def get_company_news(self):
         headlines = []
@@ -38,6 +38,7 @@ class NewsContent:
     def send_news_notifications(self):
         headlines, briefs = self.get_company_news()
 
+        print("NEWS HEADLINES----------------")
         for headline, brief in zip(headlines, briefs):
             print(f"{self.stock} {self.direction_symbol}: {self.difference}%\n"
                   f"Headlines:\t{headline}:\n{brief}")

@@ -84,13 +84,21 @@ class StockPrice:
         difference = (abs(yesterday_closing - day_before_closing)/yesterday_closing) * 100
 
         if difference >= 0:
-            results = namedtuple("Compare_Prices", ["difference", "up_or_down", "company_name", "stock"])
+            results = namedtuple("Compare_Prices", ["difference", "direction_symbol", "company_name", "stock"])
             if yesterday_closing > day_before_closing:
                 direction_symbol = "🔺"
             else:
                 direction_symbol = "🔻"
 
-            return results(difference, direction_symbol, self.company_name, self.stock)
+            # stock_results = {"difference": difference,
+            #                  "direction_symbol": direction_symbol,
+            #                  "company_name": self.company_name,
+            #                  "stock": self.stock}
+
+            company_name = self.company_name
+            stock = self.stock
+            return results(difference, direction_symbol, company_name, stock)
+            # return stock_results
         else:
             return False
 
