@@ -9,11 +9,11 @@ CONFIG = dotenv_values(".env")
 
 
 class StockPrice:
-    def __init__(self):
+    def __init__(self, company_name):
         # Stock API Info
         self.stock_url = "https://www.alphavantage.co/query?"
         self.stock = "TSLA"
-        self.company_name = "Tesla"
+        self.company_name = company_name
         self.stock_data = None
         self.api_key = CONFIG.get('STOCK_API_KEY')
         self.direction_symbol = None

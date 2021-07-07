@@ -1,7 +1,9 @@
 from stock_tracker import StockPrice
 from news_tracker import NewsContent
 
-stock = StockPrice()
+stock_to_track = input("Enter company name: ")
+
+stock = StockPrice(stock_to_track)
 
 print(stock.get_last_closing())
 compare_prices = stock.compare_closing()
