@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 import pandas as pd
+from pprint import pprint
 from collections import namedtuple
 from dotenv import dotenv_values
 
@@ -12,8 +13,8 @@ class StockPrice:
     def __init__(self, company_name):
         # Stock API Info
         self.stock_url = "https://www.alphavantage.co/query?"
-        self.stock = "TSLA"
         self.company_name = company_name
+        self.stock = self.get_stock_ticker()
         self.stock_data = None
         self.api_key = CONFIG.get('STOCK_API_KEY')
         self.direction_symbol = None
@@ -25,6 +26,25 @@ class StockPrice:
         self.data_dir = "data"
         self.path = os.path.join(self.current_dir, self.data_dir)
         self.stock_api_response()
+
+    def get_stock_ticker(self):
+        url = f'https://finnhub.io/api/v1/search?'
+        params = {'q': self.company_name, "token": CONFIG.get("FINNHUB_API_KEY")}
+        response = requests.get(url=url, params=params)
+        # print(response)
+        response.raise_for_status()
+        data = response.json()
+        pprint(data)
+        try:
+            official_name = data.get("result")[0].get("description")
+            ticker = data.get("result")[0].get("symbol")
+            print(ticker, official_name)
+        except IndexError:
+            print("Please check the spelling in the company name and re-enter!")
+            return False
+        else:
+            self.company_name = official_name
+            return ticker
 
     def stock_api_response(self):
         response = requests.get(url=self.stock_url, params=self.stock_params)
@@ -55,14 +75,15 @@ class StockPrice:
         try:
             csv_stock_data = pd.read_csv(f"{self.path}/TIME_SERIES_DAILY_ADJUSTED.csv", index_col=0)
         except FileNotFoundError:
+            print("filenotfound error")
             csv_stock_data = pd.read_csv("TIME_SERIES_DAILY_ADJUSTED.csv", index_col=0)
         except Exception as err:
             print(f"Unexpected error opening data file is {repr(err)}")
             sys.exit(1)
-        finally:
-            self.stock_data = csv_stock_data
-            print(self.stock_data.head())
-            return self.stock_data
+        # finally:
+        self.stock_data = csv_stock_data
+        print(self.stock_data.head())
+        # return self.stock_data
 
     def get_last_closing(self) -> float:
         yesterday_data = self.stock_data.iloc[0]
@@ -101,5 +122,4 @@ class StockPrice:
             # return stock_results
         else:
             return False
-
-# stock = StockPrice()
+# stock = StockPrice("tesla")
