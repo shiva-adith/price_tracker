@@ -15,9 +15,10 @@ class StockPrice:
         # Stock API Info
         self.stock_url = "https://www.alphavantage.co/query?"
         self.company_name = company_name
-        self.stock = self.get_stock_ticker()
-        self.stock_data = None
         self.api_key = CONFIG.get('STOCK_API_KEY')
+        self.stock = self.get_stock_ticker()
+        # self.stock = self.backup_stock_ticker()
+        self.stock_data = None
         self.direction_symbol = None
         self.stock_params = {"function": "TIME_SERIES_DAILY_ADJUSTED",
                              "symbol": self.stock,
@@ -29,6 +30,26 @@ class StockPrice:
         self.stock_api_response()
 
     def get_stock_ticker(self):
+        search_params = {"function": "SYMBOL_SEARCH",
+                         "keywords": self.company_name,
+                         "apikey": self.api_key}
+        response = requests.get(url=self.stock_url, params=search_params)
+        response.raise_for_status()
+        print(response.status_code)
+
+        try:
+            data = response.json()
+            pprint(data)
+            top_match = data.get("bestMatches")[0]
+            ticker = top_match.get("1. symbol")
+            print(f"Ticker: {ticker}\tName: {top_match.get('2. name')}")
+            self.company_name = top_match.get("name")
+        except IndexError:
+            return self.backup_stock_ticker()
+        else:
+            return ticker
+
+    def backup_stock_ticker(self):
         official_name = None
         ticker = None
         url = f'https://finnhub.io/api/v1/search?'
@@ -164,4 +185,4 @@ class StockPrice:
             # return stock_results
         else:
             return False
-# stock = StockPrice("tesla")
+# stock = StockPrice("fw")
