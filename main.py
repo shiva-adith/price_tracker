@@ -5,7 +5,10 @@ from flask import render_template, redirect, url_for
 from stock_tracker import StockPrice
 from news_tracker import NewsContent
 from notification_manager import NotificationsManager
+from data_handler import DataManager
 from forms import RegistrationForm
+from pprint import pprint
+from werkzeug.security import generate_password_hash, check_password_hash
 
 CONFIG = dotenv_values(".env")
 
@@ -45,7 +48,17 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        print("Success")
+        user_info = {"username": form.username.data,
+                     "email": form.email.data,
+                     "number": form.number.data,
+                     "password": form.password.data}
+
+        data = DataManager(user_info)
+        if not data.check_user_exists(user=user_info):
+            print("User Added")
+            pprint(user_info)
+        else:
+            print("User is already registered!")
 
 
 def stock_app():
