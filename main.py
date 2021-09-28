@@ -1,7 +1,6 @@
 from dotenv import dotenv_values
-from flask import Flask
+from flask import Flask, flash, render_template, redirect, url_for
 from flask_bootstrap import Bootstrap
-from flask import render_template, redirect, url_for
 from stock_tracker import StockPrice
 from news_tracker import NewsContent
 from notification_manager import NotificationsManager
@@ -14,12 +13,12 @@ CONFIG = dotenv_values(".env")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = CONFIG.get("FLASK_SECRET_KEY")
-Bootstrap(app)
+bootstrap = Bootstrap(app)
 
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def home():
-    stock_app()
+    # stock_app()
     return render_template("index.html")
 
 
@@ -43,7 +42,7 @@ def contact():
     pass
 
 
-@app.route("/register")
+@app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
 
@@ -56,9 +55,15 @@ def register():
         data = DataManager(user_info)
         if not data.check_user_exists(user=user_info):
             print("User Added")
+            flash("Successfully Added User", category='message')
             pprint(user_info)
+            return redirect(url_for('home'))
         else:
             print("User is already registered!")
+            flash("User exists!", category='error')
+            return redirect(url_for('register'))
+
+    return render_template('register.html', form=form)
 
 
 def stock_app():
