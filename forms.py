@@ -9,3 +9,4 @@ class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired(), Length(min=8, max=20)])
     number = TelField("Phone Number", validators=[InputRequired()])
+    submit = SubmitField("Register")

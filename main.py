@@ -61,7 +61,7 @@ def register():
         else:
             print("User is already registered!")
             flash("User exists!", category='error')
-            return redirect(url_for('register'))
+            return redirect(url_for('register'))  
 
     return render_template('register.html', form=form)
 
